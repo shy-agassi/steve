@@ -23,4 +23,4 @@
 <%-- This is the global variable to be used in every jsp file as the prefix of the links --%>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" />
 <c:set var="srvName" value="${pageContext.request.serverName}" />
-<c:set var="mapPort" value="5000" />
+<c:set var="GrafanaPort" value="3000" />
