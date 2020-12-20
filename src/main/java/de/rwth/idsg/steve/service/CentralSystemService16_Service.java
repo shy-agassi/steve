@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
-import de.rwth.idsg.steve.repository.SettingsRepository;
+import de.rwth.idsg.steve.repository.SteveSettingsRepository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
@@ -67,7 +67,7 @@ import java.util.Optional;
 public class CentralSystemService16_Service {
 
     @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private SettingsRepository settingsRepository;
+    @Autowired private SteveSettingsRepository settingsRepository;
 
     @Autowired private OcppTagService ocppTagService;
     @Autowired private NotificationService notificationService;

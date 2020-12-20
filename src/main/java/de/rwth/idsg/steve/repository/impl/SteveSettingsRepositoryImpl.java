@@ -22,10 +22,10 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.repository.SettingsRepository;
+import de.rwth.idsg.steve.repository.SteveSettingsRepository;
 import de.rwth.idsg.steve.repository.dto.MailSettings;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
-import jooq.steve.db.tables.records.SettingsRecord;
+import jooq.steve.db.tables.records.SteveSettingsRecord;
 import org.jetbrains.annotations.Nullable;
 import org.jooq.DSLContext;
 import org.jooq.exception.DataAccessException;
@@ -41,14 +41,14 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static jooq.steve.db.tables.Settings.SETTINGS;
+import static jooq.steve.db.tables.SteveSettings.STEVE_SETTINGS;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 06.11.2015
  */
 @Repository
-public class SettingsRepositoryImpl implements SettingsRepository {
+public class SteveSettingsRepositoryImpl implements SteveSettingsRepository {
 
     // Totally unnecessary to specify charset here. We just do it to make findbugs plugin happy.
     //
@@ -64,7 +64,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public SettingsForm getForm() {
-        SettingsRecord r = getInternal();
+        SteveSettingsRecord r = getInternal();
 
         List<String> eMails = split(r.getMailRecipients());
         List<NotificationFeature> features = splitFeatures(r.getNotificationFeatures());
@@ -87,7 +87,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public MailSettings getMailSettings() {
-        SettingsRecord r = getInternal();
+        SteveSettingsRecord r = getInternal();
 
         List<String> eMails = split(r.getMailRecipients());
         List<NotificationFeature> features = splitFeatures(r.getNotificationFeatures());
@@ -121,19 +121,19 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         String features = join(form.getEnabledFeatures());
 
         try {
-            ctx.update(SETTINGS)
-               .set(SETTINGS.HEARTBEAT_INTERVAL_IN_SECONDS, toSec(form.getHeartbeat()))
-               .set(SETTINGS.HOURS_TO_EXPIRE, form.getExpiration())
-               .set(SETTINGS.MAIL_ENABLED, form.getEnabled())
-               .set(SETTINGS.MAIL_HOST, form.getHost())
-               .set(SETTINGS.MAIL_USERNAME, form.getUsername())
-               .set(SETTINGS.MAIL_PASSWORD, form.getPassword())
-               .set(SETTINGS.MAIL_FROM, form.getFrom())
-               .set(SETTINGS.MAIL_PROTOCOL, form.getProtocol())
-               .set(SETTINGS.MAIL_PORT, form.getPort())
-               .set(SETTINGS.MAIL_RECIPIENTS, eMails)
-               .set(SETTINGS.NOTIFICATION_FEATURES, features)
-               .where(SETTINGS.APP_ID.eq(APP_ID))
+            ctx.update(STEVE_SETTINGS)
+               .set(STEVE_SETTINGS.HEARTBEAT_INTERVAL_IN_SECONDS, toSec(form.getHeartbeat()))
+               .set(STEVE_SETTINGS.HOURS_TO_EXPIRE, form.getExpiration())
+               .set(STEVE_SETTINGS.MAIL_ENABLED, form.getEnabled())
+               .set(STEVE_SETTINGS.MAIL_HOST, form.getHost())
+               .set(STEVE_SETTINGS.MAIL_USERNAME, form.getUsername())
+               .set(STEVE_SETTINGS.MAIL_PASSWORD, form.getPassword())
+               .set(STEVE_SETTINGS.MAIL_FROM, form.getFrom())
+               .set(STEVE_SETTINGS.MAIL_PROTOCOL, form.getProtocol())
+               .set(STEVE_SETTINGS.MAIL_PORT, form.getPort())
+               .set(STEVE_SETTINGS.MAIL_RECIPIENTS, eMails)
+               .set(STEVE_SETTINGS.NOTIFICATION_FEATURES, features)
+               .where(STEVE_SETTINGS.APP_ID.eq(APP_ID))
                .execute();
 
         } catch (DataAccessException e) {
@@ -141,9 +141,9 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         }
     }
 
-    private SettingsRecord getInternal() {
-        return ctx.selectFrom(SETTINGS)
-                  .where(SETTINGS.APP_ID.eq(APP_ID))
+    private SteveSettingsRecord getInternal() {
+        return ctx.selectFrom(STEVE_SETTINGS)
+                  .where(STEVE_SETTINGS.APP_ID.eq(APP_ID))
                   .fetchOne();
     }
 

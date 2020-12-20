@@ -25,7 +25,7 @@ import de.rwth.idsg.steve.web.dto.SettingsForm;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 06.11.2015
  */
-public interface SettingsRepository {
+public interface SteveSettingsRepository {
     SettingsForm getForm();
     MailSettings getMailSettings();
     int getHeartbeatIntervalInSeconds();
