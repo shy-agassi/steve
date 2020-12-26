@@ -38,7 +38,7 @@
     <script type="text/javascript" src="${ctxPath}/static/js/jquery-ui-timepicker-addon.min.js" ></script>
     <script type="text/javascript" src="${ctxPath}/static/js/script.js" ></script>
     <script type="text/javascript" src="${ctxPath}/static/js/stupidtable.min.js" ></script>
-    <title>SteVe - Steckdosenverwaltung</title>
+    <title>Irasus Electric Vehicle Charging Station Management System</title>
 </head>
 <body>
 <div class="main">
@@ -51,10 +51,11 @@
         <div class="container">
                 <ul class="navigation">
                     <li><a href="${ctxPath}/manager/home">HOME</a></li>
+                    <li><a href="http://${srvName}:${GrafanaPort}">DASHBOARDS</a></li>
                     <li><a>DATA MANAGEMENT &raquo;</a>
                         <ul>
                             <li><a href="${ctxPath}/manager/chargepoints">CHARGE POINTS</a></li>
-                            <li><a href="${ctxPath}/manager/ocppTags">OCPP TAGS</a></li>
+                            <li><a href="${ctxPath}/manager/ocppTags">TAGS</a></li>
                             <li><a href="${ctxPath}/manager/users">USERS</a></li>
                             <li><a href="${ctxPath}/manager/chargingProfiles">CHARGING PROFILES</a></li>
                             <li><a href="${ctxPath}/manager/reservations">RESERVATIONS</a></li>
@@ -70,7 +71,7 @@
                         </ul>
                     </li>
                     <li><a href="${ctxPath}/manager/settings">SETTINGS</a></li>
-                    <li><a href="${ctxPath}/manager/log">LOG</a></li>
+                    <!-- <li><a href="${ctxPath}/manager/log">LOG</a></li> -->
                     <li><a href="${ctxPath}/manager/about">ABOUT</a></li>
                     <li><a href="${ctxPath}/manager/signout">SIGN OUT</a></li>
                 </ul>

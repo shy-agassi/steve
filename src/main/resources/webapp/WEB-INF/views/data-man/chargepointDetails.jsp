@@ -85,7 +85,7 @@
                         </td>
                     </tr>
                     <tr><td>Endpoint Address:</td><td>${cp.chargeBox.endpointAddress}</td></tr>
-                    <tr><td>Ocpp Protocol:</td><td>${cp.chargeBox.ocppProtocol}</td></tr>
+                    <tr><td>OCPP Protocol:</td><td>${cp.chargeBox.ocppProtocol}</td></tr>
                     <tr><td>Charge Point Vendor:</td><td>${cp.chargeBox.chargePointVendor}</td></tr>
                     <tr><td>Charge Point Model:</td><td>${cp.chargeBox.chargePointModel}</td></tr>
                     <tr><td>Charge Point Serial Number:</td><td>${cp.chargeBox.chargePointSerialNumber}</td></tr>
@@ -105,7 +105,7 @@
                         <td>
                             <form:checkbox path="insertConnectorStatusAfterTransactionMsg"/>
                             <a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
-                                <span>After a transaction start/stop message, a charging station might send a connector status notification, but it is not required. If this is enabled, SteVe will update the connector status no matter what.</span>
+                                <span>After a transaction start/stop message, a charging station might send a connector status notification, but it is not required. If this is enabled, Irasus EVCSMS will update the connector status no matter what.</span>
                             </a>
                         </td>
                     </tr>
