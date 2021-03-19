@@ -48,21 +48,28 @@ import static java.lang.String.format;
 public class NotificationService {
 
     @Autowired private MailService mailService;
+    @Autowired private WebhookService webhookService;
 
     public void ocppStationBooted(String chargeBoxId, Optional<RegistrationStatus> status) {
         if (isDisabled(OcppStationBooted)) {
             return;
         }
 
-        String subject = format("Received boot notification from '%s'", chargeBoxId);
+        // String subject = format("Received boot notification from '%s'", chargeBoxId);
         String body;
+        String registration_status = "";
         if (status.isPresent()) {
-            body = format("Charging station '%s' is in database and has registration status '%s'.", chargeBoxId, status.get().value());
+            registration_status = status.get().value();
+            body = format("Charging station '%s' is in database and has registration status '%s'.", chargeBoxId, registration_status);
         } else {
             body = format("Charging station '%s' is NOT in database", chargeBoxId);
         }
 
-        mailService.sendAsync(subject, addTimestamp(body));
+        // System.out.println("{\"packetType\":\"boot\",\"error\":\"\",\"connection\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"registration\":\"" + registration_status + "\",\"iat\":\"" + DateTime.now().toString() + "\"}");
+
+        // mailService.sendAsync(subject, addTimestamp(body));
+        // webhookService.sendAsync("station", "{\"packetType\":\"boot\",\"error\":\"\",\"connection\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"registration\":\"" + registration_status + "\",\"iat\":\"" + DateTime.now().toString() + "\"}");
+        webhookService.sendAsync("boot", "{\"packetType\":\"boot\",\"error\":\"\",\"connection\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"registration\":\"" + registration_status + "\",\"iat\":\"" + DateTime.now().toString() + "\"}");
     }
 
     public void ocppStationWebSocketConnected(String chargeBoxId) {
@@ -70,9 +77,11 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Connected to JSON charging station '%s'", chargeBoxId);
+        // String subject = format("Connected to JSON charging station '%s'", chargeBoxId);
 
-        mailService.sendAsync(subject, addTimestamp(""));
+        // mailService.sendAsync(subject, addTimestamp(""));
+        // webhookService.sendAsync("station", "{\"packetType\":\"wsconnect\",\"error\":\"\",\"registration\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connection\":\"true\",\"iat\":\"" + DateTime.now().toString() + "\"}");
+        webhookService.sendAsync("boot", "{\"packetType\":\"wsconnect\",\"error\":\"\",\"registration\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connection\":\"true\",\"iat\":\"" + DateTime.now().toString() + "\"}");
     }
 
     public void ocppStationWebSocketDisconnected(String chargeBoxId) {
@@ -80,9 +89,11 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Disconnected from JSON charging station '%s'", chargeBoxId);
+        // String subject = format("Disconnected from JSON charging station '%s'", chargeBoxId);
 
-        mailService.sendAsync(subject, addTimestamp(""));
+        // mailService.sendAsync(subject, addTimestamp(""));
+        // webhookService.sendAsync("station", "{\"packetType\":\"wsconnect\",\"error\":\"\",\"registration\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connection\":\"false\",\"iat\":\"" + DateTime.now().toString() + "\"}");
+        webhookService.sendAsync("boot", "{\"packetType\":\"wsconnect\",\"error\":\"\",\"registration\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connection\":\"false\",\"iat\":\"" + DateTime.now().toString() + "\"}");
     }
 
     public void ocppStationStatusFailure(String chargeBoxId, int connectorId, String errorCode) {
@@ -90,10 +101,12 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Connector '%s' of charging station '%s' is FAULTED", connectorId, chargeBoxId);
-        String body = format("Status Error Code: '%s'", errorCode);
+        // String subject = format("Connector '%s' of charging station '%s' is FAULTED", connectorId, chargeBoxId);
+        // String body = format("Status Error Code: '%s'", errorCode);
 
-        mailService.sendAsync(subject, addTimestamp(body));
+        // mailService.sendAsync(subject, addTimestamp(body));
+        // webhookService.sendAsync("station", "{\"packetType\":\"fault\",\"connection\":\"\",\"registration\":\"\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":" + format("%s", connectorId) + "\",\"error\":\"" + errorCode + "\",\"iat\":\"" + DateTime.now().toString() + "\"}");
+        webhookService.sendAsync("boot", "{\"packetType\":\"fault\",\"connection\":\"\",\"registration\":\"\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":" + format("%s", connectorId) + "\",\"error\":\"" + errorCode + "\",\"iat\":\"" + DateTime.now().toString() + "\"}");
     }
 
     public void ocppTransactionStarted(int transactionId, InsertTransactionParams params) {
@@ -101,9 +114,10 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Transaction '%s' has started on charging station '%s' on connector '%s'", transactionId, params.getChargeBoxId(), params.getConnectorId());
+        // String subject = format("Transaction '%s' has started on charging station '%s' on connector '%s'", transactionId, params.getChargeBoxId(), params.getConnectorId());
 
-        mailService.sendAsync(subject, addTimestamp(createContent(params)));
+        // mailService.sendAsync(subject, addTimestamp(createContent(params)));
+        webhookService.sendAsync("transaction", "{\"chargeBoxId\":\"" + params.getChargeBoxId() + "\",\"connectorId\":" + params.getConnectorId() + "\",\"transactionId\":" + format("%s", transactionId) + "\",\"transaction\":\"start\",\"iat\":\"" + params.getStartTimestamp() + "\",\"tag\":\"" + params.getIdTag() + "\",\"meter\":\"" + params.getStartMeterValue() + "\"}");
     }
 
     public void ocppTransactionEnded(UpdateTransactionParams params) {
@@ -111,9 +125,10 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Transaction '%s' has ended on charging station '%s'", params.getTransactionId(), params.getChargeBoxId());
+        // String subject = format("Transaction '%s' has ended on charging station '%s'", params.getTransactionId(), params.getChargeBoxId());
 
-        mailService.sendAsync(subject, addTimestamp(createContent(params)));
+        // mailService.sendAsync(subject, addTimestamp(createContent(params)));
+        webhookService.sendAsync("transaction", "{\"chargeBoxId\":\"" + params.getChargeBoxId() + "\",\"transactionId\":" + params.getTransactionId() + "\",\"transaction\":\"stop\",\"iat\":\"" + params.getStopTimestamp() + "\",\"reason\":\"" + params.getStopReason() + "\",\"meter\":\"" + params.getStopMeterValue() + "\"}");
     }
 
     // -------------------------------------------------------------------------
