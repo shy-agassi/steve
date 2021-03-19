@@ -68,8 +68,7 @@ public class NotificationService {
         // System.out.println("{\"packetType\":\"boot\",\"error\":\"\",\"connection\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"registration\":\"" + registration_status + "\",\"iat\":\"" + DateTime.now().toString() + "\"}");
 
         // mailService.sendAsync(subject, addTimestamp(body));
-        // webhookService.sendAsync("station", "{\"packetType\":\"boot\",\"error\":\"\",\"connection\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"registration\":\"" + registration_status + "\",\"iat\":\"" + DateTime.now().toString() + "\"}");
-        webhookService.sendAsync("boot", "{\"packetType\":\"boot\",\"error\":\"\",\"connection\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"registration\":\"" + registration_status + "\",\"iat\":\"" + DateTime.now().toString() + "\"}");
+        webhookService.sendAsync("station", "{\"packetType\":\"boot\",\"error\":\"\",\"connection\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"registration\":\"" + registration_status + "\",\"iat\":\"" + DateTime.now().toString() + "\"}");
     }
 
     public void ocppStationWebSocketConnected(String chargeBoxId) {
@@ -80,8 +79,7 @@ public class NotificationService {
         // String subject = format("Connected to JSON charging station '%s'", chargeBoxId);
 
         // mailService.sendAsync(subject, addTimestamp(""));
-        // webhookService.sendAsync("station", "{\"packetType\":\"wsconnect\",\"error\":\"\",\"registration\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connection\":\"true\",\"iat\":\"" + DateTime.now().toString() + "\"}");
-        webhookService.sendAsync("boot", "{\"packetType\":\"wsconnect\",\"error\":\"\",\"registration\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connection\":\"true\",\"iat\":\"" + DateTime.now().toString() + "\"}");
+        webhookService.sendAsync("station", "{\"packetType\":\"wsconnect\",\"error\":\"\",\"registration\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connection\":\"true\",\"iat\":\"" + DateTime.now().toString() + "\"}");
     }
 
     public void ocppStationWebSocketDisconnected(String chargeBoxId) {
@@ -92,8 +90,7 @@ public class NotificationService {
         // String subject = format("Disconnected from JSON charging station '%s'", chargeBoxId);
 
         // mailService.sendAsync(subject, addTimestamp(""));
-        // webhookService.sendAsync("station", "{\"packetType\":\"wsconnect\",\"error\":\"\",\"registration\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connection\":\"false\",\"iat\":\"" + DateTime.now().toString() + "\"}");
-        webhookService.sendAsync("boot", "{\"packetType\":\"wsconnect\",\"error\":\"\",\"registration\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connection\":\"false\",\"iat\":\"" + DateTime.now().toString() + "\"}");
+        webhookService.sendAsync("station", "{\"packetType\":\"wsconnect\",\"error\":\"\",\"registration\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connection\":\"false\",\"iat\":\"" + DateTime.now().toString() + "\"}");
     }
 
     public void ocppStationStatusFailure(String chargeBoxId, int connectorId, String errorCode) {
@@ -105,8 +102,7 @@ public class NotificationService {
         // String body = format("Status Error Code: '%s'", errorCode);
 
         // mailService.sendAsync(subject, addTimestamp(body));
-        // webhookService.sendAsync("station", "{\"packetType\":\"fault\",\"connection\":\"\",\"registration\":\"\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":" + format("%s", connectorId) + "\",\"error\":\"" + errorCode + "\",\"iat\":\"" + DateTime.now().toString() + "\"}");
-        webhookService.sendAsync("boot", "{\"packetType\":\"fault\",\"connection\":\"\",\"registration\":\"\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":" + format("%s", connectorId) + "\",\"error\":\"" + errorCode + "\",\"iat\":\"" + DateTime.now().toString() + "\"}");
+        webhookService.sendAsync("station", "{\"packetType\":\"fault\",\"connection\":\"\",\"registration\":\"\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":" + format("%s", connectorId) + "\",\"error\":\"" + errorCode + "\",\"iat\":\"" + DateTime.now().toString() + "\"}");
     }
 
     public void ocppTransactionStarted(int transactionId, InsertTransactionParams params) {
