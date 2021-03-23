@@ -18,6 +18,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+// Added by Anirudh on 23/03/2021
+import org.json.JSONObject;
+
 /**
  * @author Anirudh Ramesh <anirudh@irasus.com>
  * @since 11.03.2021
@@ -44,12 +47,12 @@ public class WebhookService {
         restTemplate.setRequestFactory(factory);
     }
 
-    public void sendAsync(String endpoint, String body) {
+    public void sendAsync(String endpoint, JSONObject body) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-API-KEY", "6ovuIrVd1vVGdVnE5TtwTxPhlzZf+Dmkf6mIQw6IBMk=");
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        HttpEntity entity = new HttpEntity(body, headers);
+        HttpEntity entity = new HttpEntity(body.toMap(), headers);
         // System.out.println(body);
         try {
             String response = restTemplate.postForObject("https://dev-api.chargedock.in/ocpp/" + endpoint, entity, String.class);

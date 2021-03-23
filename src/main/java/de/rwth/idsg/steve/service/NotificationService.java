@@ -39,6 +39,9 @@ import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionEnded;
 import static java.lang.String.format;
 
+// Added by Anirudh on 23/03/2021
+import org.json.JSONObject;
+
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 22.01.2016
@@ -65,10 +68,17 @@ public class NotificationService {
             body = format("Charging station '%s' is NOT in database", chargeBoxId);
         }
 
-        // System.out.println("{\"packetType\":\"boot\",\"error\":\"\",\"connection\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"registration\":\"" + registration_status + "\",\"iat\":\"" + DateTime.now().toString() + "\"}");
+        JSONObject bodyObject = new JSONObject();
+        bodyObject.put("packetType", "boot");
+        bodyObject.put("error", "");
+        bodyObject.put("connection", "");
+        bodyObject.put("connectorId", "0");
+        bodyObject.put("chargeBoxId", chargeBoxId);
+        bodyObject.put("registration", registration_status);
+        bodyObject.put("iat", DateTime.now().toString());
+        webhookService.sendAsync("station", bodyObject);
 
         // mailService.sendAsync(subject, addTimestamp(body));
-        webhookService.sendAsync("station", "{\"packetType\":\"boot\",\"error\":\"\",\"connection\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"registration\":\"" + registration_status + "\",\"iat\":\"" + DateTime.now().toString() + "\"}");
     }
 
     public void ocppStationWebSocketConnected(String chargeBoxId) {
@@ -78,8 +88,17 @@ public class NotificationService {
 
         // String subject = format("Connected to JSON charging station '%s'", chargeBoxId);
 
+        JSONObject bodyObject = new JSONObject();
+        bodyObject.put("packetType", "wsconnect");
+        bodyObject.put("error", "");
+        bodyObject.put("registration", "");
+        bodyObject.put("connection", "true");
+        bodyObject.put("connectorId", "0");
+        bodyObject.put("chargeBoxId", chargeBoxId);
+        bodyObject.put("iat", DateTime.now().toString());
+        webhookService.sendAsync("station", bodyObject);
+
         // mailService.sendAsync(subject, addTimestamp(""));
-        webhookService.sendAsync("station", "{\"packetType\":\"wsconnect\",\"error\":\"\",\"registration\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connection\":\"true\",\"iat\":\"" + DateTime.now().toString() + "\"}");
     }
 
     public void ocppStationWebSocketDisconnected(String chargeBoxId) {
@@ -89,8 +108,17 @@ public class NotificationService {
 
         // String subject = format("Disconnected from JSON charging station '%s'", chargeBoxId);
 
+        JSONObject bodyObject = new JSONObject();
+        bodyObject.put("packetType", "wsconnect");
+        bodyObject.put("error", "");
+        bodyObject.put("registration", "");
+        bodyObject.put("connectorId", "0");
+        bodyObject.put("chargeBoxId", chargeBoxId);
+        bodyObject.put("connection", "false");
+        bodyObject.put("iat", DateTime.now().toString());
+        webhookService.sendAsync("station", bodyObject);
+
         // mailService.sendAsync(subject, addTimestamp(""));
-        webhookService.sendAsync("station", "{\"packetType\":\"wsconnect\",\"error\":\"\",\"registration\":\"\",\"connectorId\":\"0\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connection\":\"false\",\"iat\":\"" + DateTime.now().toString() + "\"}");
     }
 
     public void ocppStationStatusFailure(String chargeBoxId, int connectorId, String errorCode) {
@@ -101,8 +129,17 @@ public class NotificationService {
         // String subject = format("Connector '%s' of charging station '%s' is FAULTED", connectorId, chargeBoxId);
         // String body = format("Status Error Code: '%s'", errorCode);
 
+        JSONObject bodyObject = new JSONObject();
+        bodyObject.put("packetType", "fault");
+        bodyObject.put("error", errorCode);
+        bodyObject.put("registration", "");
+        bodyObject.put("connectorId", format("%s", connectorId));
+        bodyObject.put("chargeBoxId", chargeBoxId);
+        bodyObject.put("connection", "");
+        bodyObject.put("iat", DateTime.now().toString());
+        webhookService.sendAsync("station", bodyObject);
+
         // mailService.sendAsync(subject, addTimestamp(body));
-        webhookService.sendAsync("station", "{\"packetType\":\"fault\",\"connection\":\"\",\"registration\":\"\",\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":" + format("%s", connectorId) + "\",\"error\":\"" + errorCode + "\",\"iat\":\"" + DateTime.now().toString() + "\"}");
     }
 
     public void ocppTransactionStarted(int transactionId, InsertTransactionParams params) {
@@ -112,8 +149,17 @@ public class NotificationService {
 
         // String subject = format("Transaction '%s' has started on charging station '%s' on connector '%s'", transactionId, params.getChargeBoxId(), params.getConnectorId());
 
+        JSONObject bodyObject = new JSONObject();
+        bodyObject.put("chargeBoxId", params.getChargeBoxId());
+        bodyObject.put("connectorId", params.getConnectorId());
+        bodyObject.put("transactionId", format("%s", transactionId));
+        bodyObject.put("transaction", "start");
+        bodyObject.put("tag", params.getIdTag());
+        bodyObject.put("meter", params.getStartMeterValue());
+        bodyObject.put("iat", params.getStartTimestamp());
+        webhookService.sendAsync("transaction", bodyObject);
+
         // mailService.sendAsync(subject, addTimestamp(createContent(params)));
-        webhookService.sendAsync("transaction", "{\"chargeBoxId\":\"" + params.getChargeBoxId() + "\",\"connectorId\":" + params.getConnectorId() + "\",\"transactionId\":" + format("%s", transactionId) + "\",\"transaction\":\"start\",\"iat\":\"" + params.getStartTimestamp() + "\",\"tag\":\"" + params.getIdTag() + "\",\"meter\":\"" + params.getStartMeterValue() + "\"}");
     }
 
     public void ocppTransactionEnded(UpdateTransactionParams params) {
@@ -123,8 +169,16 @@ public class NotificationService {
 
         // String subject = format("Transaction '%s' has ended on charging station '%s'", params.getTransactionId(), params.getChargeBoxId());
 
+        JSONObject bodyObject = new JSONObject();
+        bodyObject.put("chargeBoxId", params.getChargeBoxId());
+        bodyObject.put("transactionId", params.getTransactionId());
+        bodyObject.put("transaction", "stop");
+        bodyObject.put("iat", params.getStopTimestamp());
+        bodyObject.put("reason", params.getStopReason());
+        bodyObject.put("meter", params.getStopMeterValue());
+        webhookService.sendAsync("transaction", bodyObject);
+
         // mailService.sendAsync(subject, addTimestamp(createContent(params)));
-        webhookService.sendAsync("transaction", "{\"chargeBoxId\":\"" + params.getChargeBoxId() + "\",\"transactionId\":" + params.getTransactionId() + "\",\"transaction\":\"stop\",\"iat\":\"" + params.getStopTimestamp() + "\",\"reason\":\"" + params.getStopReason() + "\",\"meter\":\"" + params.getStopMeterValue() + "\"}");
     }
 
     // -------------------------------------------------------------------------
