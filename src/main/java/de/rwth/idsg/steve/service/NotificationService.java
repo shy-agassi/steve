@@ -156,7 +156,7 @@ public class NotificationService {
         bodyObject.put("transaction", "start");
         bodyObject.put("tag", params.getIdTag());
         bodyObject.put("meter", params.getStartMeterValue());
-        bodyObject.put("iat", params.getStartTimestamp());
+        bodyObject.put("iat", params.getStartTimestamp().toString());
         webhookService.sendAsync("transaction", bodyObject);
 
         // mailService.sendAsync(subject, addTimestamp(createContent(params)));
@@ -173,7 +173,7 @@ public class NotificationService {
         bodyObject.put("chargeBoxId", params.getChargeBoxId());
         bodyObject.put("transactionId", params.getTransactionId());
         bodyObject.put("transaction", "stop");
-        bodyObject.put("iat", params.getStopTimestamp());
+        bodyObject.put("iat", params.getStopTimestamp().toString());
         bodyObject.put("reason", params.getStopReason());
         bodyObject.put("meter", params.getStopMeterValue());
         webhookService.sendAsync("transaction", bodyObject);
