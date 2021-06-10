@@ -59,12 +59,19 @@ public class SettingsForm {
     // -------------------------------------------------------------------------
 
     @NotNull
-    private Boolean enabled;
+    private Boolean enabled,flowEnabled;
+    //-----------
+    //----------
 
     @Email(message = "'From' field is not a valid e-mail address")
     private String from;
 
     private String host, username, password, protocol;
+    
+    //--------------
+    private String flow;
+    
+    //--------------------
 
     @Min(value = 1, message = "Port must be positive")
     private Integer port;

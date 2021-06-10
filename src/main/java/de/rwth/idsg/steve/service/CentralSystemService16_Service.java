@@ -152,9 +152,9 @@ public class CentralSystemService16_Service {
                 parameters.getConnectorId(),
                 parameters.getTransactionId()
         );
-
+        //System.out.println("meter in Central service system working");
         // Anirudh: Metering email/webhook trigger will go here
-        // notificationService.ocppMetering(chargeBoxIdentity, parameters.getConnectorId(), parameters.getTransactionId(), parameters.getMeterValue());
+        notificationService.ocppMetering(chargeBoxIdentity, parameters.getConnectorId(), parameters.getMeterValue()); //, parameters.getTransactionId()
 
         return new MeterValuesResponse();
     }

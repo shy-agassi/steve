@@ -1,0 +1,2 @@
+ALTER TABLE `steve_settings`
+      ADD COLUMN `flow` VARCHAR(255) DEFAULT NULL;

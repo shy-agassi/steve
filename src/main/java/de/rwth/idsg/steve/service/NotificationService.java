@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Timer;
 
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationBooted;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationStatusFailure;
@@ -38,6 +39,11 @@ import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketDisconn
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionEnded;
 import static java.lang.String.format;
+
+//Added bu Divyanshu on 26/05/2021
+import ocpp.cs._2015._10.MeterValue;
+import java.util.List;
+//import ocpp.cs._2015._10.SampledValue;
 
 // Added by Anirudh on 23/03/2021
 import org.json.JSONObject;
@@ -54,7 +60,7 @@ import org.json.JSONObject;
 public class NotificationService {
 
     @Autowired private MailService mailService;
-    @Autowired private WebhookService webhookService;
+    @Autowired private FlowService webhookService;
 
     public void ocppStationBooted(String chargeBoxId, Optional<RegistrationStatus> status) {
         if (isDisabled(OcppStationBooted)) {
@@ -72,6 +78,7 @@ public class NotificationService {
         }
 
         JSONObject bodyObject = new JSONObject();
+        bodyObject.put("boot", 1);
         bodyObject.put("packetType", "boot");
         bodyObject.put("error", "");
         bodyObject.put("connection", "");
@@ -84,11 +91,51 @@ public class NotificationService {
         // mailService.sendAsync(subject, addTimestamp(body));
     }
 
-    public void ocppHeartbeat(String chargeBoxId, String timestamp) {}
+    public void ocppHeartbeat(String chargeBoxId, String timestamp) {
+        //System.out.println("HeartBeat function enter");
+        JSONObject bodyObject = new JSONObject();
+        bodyObject.put("heartbeat", 1);
+        bodyObject.put("Task","HeartBeat");
+        bodyObject.put("Connection","True");
+        bodyObject.put("ConnectorID","0");
+        bodyObject.put("ChargeBoxid",chargeBoxId);
+        bodyObject.put("TimeStand",timestamp);
+        bodyObject.put("iat",DateTime.now().toString());
+        webhookService.sendAsync("station", bodyObject);
+    }
 
-    public void ocppDiagnostics(String chargeBoxId, String status) {}
+    
+    public void ocppDiagnostics(String chargeBoxId, String status) {
+        //JSONObject bodyObject = new JSONObject();
+        //bodyObject.put("diagnostics", 1);
+        //bodyObject.put("Task","HeartBeat");
+        //bodyObject.put("Connection","True");
+        //bodyObject.put("ConnectorID","0");
+        //bodyObject.put("ChargeBoxid",chargeBoxId);
+        //bodyObject.put("status",status);
+        //bodyObject.put("iat",DateTime.now().toString());
+        //webhookService.sendAsync("station", bodyObject);
+    }
 
-    // public void ocppMetering(String chargeBoxId, String connectorId, String transactionId, List<MeterValue> meterValue) {}
+    
+    public void ocppMetering(String chargeBoxId, int connectorId,List<MeterValue> values  ) //List<MeterValue> meterValue)   , int transactionId
+    {   
+        JSONObject bodyObject = new JSONObject();
+        bodyObject.put("metering", 1);
+        bodyObject.put("Task","Metering");
+        bodyObject.put("ChargeBoxId",chargeBoxId);
+        bodyObject.put("Connection","True");
+        //values.get(0).getSampledValue().get(0).getValue()
+        //bodyObject.put("Meter Value", values);
+        bodyObject.put("Voltage Value", values.get(0).getSampledValue().get(0).getValue());
+        bodyObject.put("Current Value", values.get(0).getSampledValue().get(1).getValue());
+        bodyObject.put("Power Value", values.get(0).getSampledValue().get(2).getValue());
+        bodyObject.put("Energy Value", values.get(0).getSampledValue().get(3).getValue());
+        webhookService.sendAsync("station", bodyObject);
+    }
+
+
+
 
     public void ocppStationWebSocketConnected(String chargeBoxId) {
         if (isDisabled(OcppStationWebSocketConnected)) {
@@ -98,6 +145,7 @@ public class NotificationService {
         // String subject = format("Connected to JSON charging station '%s'", chargeBoxId);
 
         JSONObject bodyObject = new JSONObject();
+        bodyObject.put("socketConnect", 1);
         bodyObject.put("packetType", "wsconnect");
         bodyObject.put("error", "");
         bodyObject.put("registration", "");
@@ -106,7 +154,7 @@ public class NotificationService {
         bodyObject.put("chargeBoxId", chargeBoxId);
         bodyObject.put("iat", DateTime.now().toString());
         webhookService.sendAsync("station", bodyObject);
-
+        //System.out.println("working here");
         // mailService.sendAsync(subject, addTimestamp(""));
     }
 
@@ -118,6 +166,7 @@ public class NotificationService {
         // String subject = format("Disconnected from JSON charging station '%s'", chargeBoxId);
 
         JSONObject bodyObject = new JSONObject();
+        bodyObject.put("socketDisconnect", 1);
         bodyObject.put("packetType", "wsconnect");
         bodyObject.put("error", "");
         bodyObject.put("registration", "");
@@ -139,6 +188,7 @@ public class NotificationService {
         // String body = format("Status Error Code: '%s'", errorCode);
 
         JSONObject bodyObject = new JSONObject();
+        bodyObject.put("statusFailure", 1);
         bodyObject.put("packetType", "fault");
         bodyObject.put("error", errorCode);
         bodyObject.put("registration", "");
@@ -159,6 +209,7 @@ public class NotificationService {
         // String subject = format("Transaction '%s' has started on charging station '%s' on connector '%s'", transactionId, params.getChargeBoxId(), params.getConnectorId());
 
         JSONObject bodyObject = new JSONObject();
+        bodyObject.put("transactionStarted", 1);
         bodyObject.put("chargeBoxId", params.getChargeBoxId());
         bodyObject.put("connectorId", params.getConnectorId());
         bodyObject.put("transactionId", format("%s", transactionId));
@@ -179,6 +230,7 @@ public class NotificationService {
         // String subject = format("Transaction '%s' has ended on charging station '%s'", params.getTransactionId(), params.getChargeBoxId());
 
         JSONObject bodyObject = new JSONObject();
+        bodyObject.put("transactionEnded", 1);
         bodyObject.put("chargeBoxId", params.getChargeBoxId());
         bodyObject.put("transactionId", params.getTransactionId());
         bodyObject.put("transaction", "stop");
