@@ -42,6 +42,9 @@ import static java.lang.String.format;
 // Added by Anirudh on 23/03/2021
 import org.json.JSONObject;
 
+// import ocpp.cs._2015._10.MeterValue;
+// import java.util.List;
+
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 22.01.2016
@@ -80,6 +83,12 @@ public class NotificationService {
 
         // mailService.sendAsync(subject, addTimestamp(body));
     }
+
+    public void ocppHeartbeat(String chargeBoxId, String timestamp) {}
+
+    public void ocppDiagnostics(String chargeBoxId, String status) {}
+
+    // public void ocppMetering(String chargeBoxId, String connectorId, String transactionId, List<MeterValue> meterValue) {}
 
     public void ocppStationWebSocketConnected(String chargeBoxId) {
         if (isDisabled(OcppStationWebSocketConnected)) {

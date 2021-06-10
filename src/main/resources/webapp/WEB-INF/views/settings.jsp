@@ -51,13 +51,13 @@
     <br>
 
     <section><span>
-        Mail Notification Setting
+        Notification Settings
         <a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
-            <span>Specify the recipients of the notifications by entering one e-mail address per line</span>
+            <span>Specify the recipients of the notifications by entering one e-mail address per line and/or one webhook recipient</span>
         </a>
     </span></section>
     <table class="userInputFullPage">
-        <tr><td>Enable Notifications?:</td><td><form:checkbox path="enabled"/></td></tr>
+        <tr><td>Enable E-Mail Notifications?:</td><td><form:checkbox path="enabled"/></td></tr>
         <tr><td>Protocol:</td><td><form:input path="protocol"/></td></tr>
         <tr><td>Host:</td><td><form:input path="host"/></td></tr>
         <tr><td>Port:</td><td><form:input path="port"/></td></tr>

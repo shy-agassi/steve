@@ -288,7 +288,7 @@ public class ApiController {
                     .filter(cs -> chargeBoxId.equals(cs.getChargeBoxId()))
                     .findAny()
                     .orElse(null).getStatus() + "\",";
-            String x4 = "\"heartbeatTimestamp\":\"" + cp.getChargeBox().getLastHeartbeatTimestamp().getMillis() + "\",}";
+            String x4 = "\"heartbeatTimestamp\":\"" + cp.getChargeBox().getLastHeartbeatTimestamp().getMillis() + "\"}";
 
             writeOutput(response, x1 + x2 + x3 + x4);
         } catch (NullPointerException nullPointerException) {

@@ -153,7 +153,8 @@ public class CentralSystemService16_Service {
                 parameters.getTransactionId()
         );
 
-        // Irasus: Metering email/webhook trigger will go here
+        // Anirudh: Metering email/webhook trigger will go here
+        // notificationService.ocppMetering(chargeBoxIdentity, parameters.getConnectorId(), parameters.getTransactionId(), parameters.getMeterValue());
 
         return new MeterValuesResponse();
     }
@@ -162,6 +163,10 @@ public class CentralSystemService16_Service {
             DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
         String status = parameters.getStatus().value();
         ocppServerRepository.updateChargeboxDiagnosticsStatus(chargeBoxIdentity, status);
+
+        // Anirudh: Diagnostics email/webhook trigger will go here
+        notificationService.ocppDiagnostics(chargeBoxIdentity, status);
+
         return new DiagnosticsStatusNotificationResponse();
     }
 
@@ -227,6 +232,9 @@ public class CentralSystemService16_Service {
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {
         DateTime now = DateTime.now();
         ocppServerRepository.updateChargeboxHeartbeat(chargeBoxIdentity, now);
+
+        // Anirudh: Heartbeat email/webhook trigger will go here
+        notificationService.ocppHeartbeat(chargeBoxIdentity, now.toString());
 
         return new HeartbeatResponse().withCurrentTime(now);
     }

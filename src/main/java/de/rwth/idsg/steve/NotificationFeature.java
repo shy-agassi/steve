@@ -28,6 +28,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum NotificationFeature {
 
+    // Anirudh: Add separate checkboxes for webhooks
+
     // Ocpp related
     //
     OcppStationBooted(" a charging station sends a boot notification (Note: This activates notifications about failed connection attempts for unregistered JSON stations, as well)"),
