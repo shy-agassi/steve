@@ -30,7 +30,7 @@ ALTER TABLE connector_meter_value CONVERT TO CHARACTER SET utf8 COLLATE utf8_uni
 ALTER TABLE connector_status CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE ocpp_tag CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE reservation CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-ALTER TABLE settings CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+ALTER TABLE steve_settings CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE `transaction` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE `user` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
@@ -46,7 +46,7 @@ REPAIR TABLE
   connector_status,
   ocpp_tag,
   reservation,
-  settings,
+  steve_settings,
   `transaction`,
   `user`;
 
@@ -58,6 +58,6 @@ OPTIMIZE TABLE
   connector_status,
   ocpp_tag,
   reservation,
-  settings,
+  steve_settings,
   `transaction`,
   `user`;

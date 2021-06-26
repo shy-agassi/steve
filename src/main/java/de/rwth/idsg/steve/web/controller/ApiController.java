@@ -32,6 +32,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.jetty.util.ajax.JSON;
+import org.json.JSONObject;
+
 @Slf4j
 @RestController
 @CrossOrigin
@@ -64,14 +67,14 @@ public class ApiController {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
-    @GetMapping(value = sCHARGEBOXID + "/connectorIds")
+    @GetMapping(value = "/connectorIds" + sCHARGEBOXID)
     public void getConnectorIds(@PathVariable("chargeBoxId") String chargeBoxId,
                                 HttpServletResponse response) throws IOException {
         String s = serializeArray(chargePointRepository.getNonZeroConnectorIds(chargeBoxId));
         writeOutput(response, s);
     }
 
-    @GetMapping(value = sCHARGEBOXID + "/startSession/{idTag}")
+    @GetMapping(value = "/startSession"+ sCHARGEBOXID + "/{idTag}")
     public void startRemoteSession(@PathVariable("chargeBoxId") String chargeBoxId,
                                    @PathVariable("idTag") String idTag,
                                    HttpServletResponse response) throws IOException {
@@ -93,14 +96,46 @@ public class ApiController {
                 if (result.getResponse() == null) {
                     response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
                     // writeOutput(response, objectMapper.writeValueAsString("Is charger connected to CMS?"));
-                    writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"tag\":\"" + idTag + "\",\"status\":\"failed\",\"response\":\"Charger disconnected from the CMS\"}");
+                    
+                    //-----------------------------------added------------------------------------
+                    JSONObject temp = new JSONObject();
+                    temp.put("chargeBoxId", chargeBoxId);
+                    temp.put("connectorId", 2);
+                    temp.put("tag", idTag);
+                    temp.put("status", "failed");
+                    temp.put("response", "Charger disconnected from the CMS");
+                    writeOutput(response, temp.toString());
+                    //----------------------------------added--------------------------------------
+                    //writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"tag\":\"" + idTag + "\",\"status\":\"failed\",\"response\":\"Charger disconnected from the CMS\"}");
+                
                 } else if (!result.getResponse().equals("Accepted")) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     // writeOutput(response, objectMapper.writeValueAsString(result.getResponse()));http://cdn.softbank.jp
-                    writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"tag\":\"" + idTag + "\",\"status\":\"failed\",\"response\":" + objectMapper.writeValueAsString(result.getResponse()) + "}");
+                    
+                    //-----------------------------------added------------------------------------
+                    JSONObject temp = new JSONObject();
+                    temp.put("chargeBoxId", chargeBoxId);
+                    temp.put("connectorId", 2);
+                    temp.put("tag", idTag);
+                    temp.put("status", "failed");
+                    temp.put("response", objectMapper.writeValueAsString(result.getResponse()));
+                    writeOutput(response, temp.toString());
+                    //----------------------------------added--------------------------------------
+                    //writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"tag\":\"" + idTag + "\",\"status\":\"failed\",\"response\":" + objectMapper.writeValueAsString(result.getResponse()) + "}");
+                
                 } else {
                     // writeOutput(response, objectMapper.writeValueAsString(result.getResponse()));
-                    writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"tag\":\"" + idTag + "\",\"status\":\"created\",\"response\":" + objectMapper.writeValueAsString(result.getResponse()) + "}");
+
+                    //-----------------------------------added------------------------------------
+                    JSONObject temp = new JSONObject();
+                    temp.put("chargeBoxId", chargeBoxId);
+                    temp.put("connectorId", 2);
+                    temp.put("tag", idTag);
+                    temp.put("status", "created");
+                    temp.put("response", objectMapper.writeValueAsString(result.getResponse()));
+                    writeOutput(response, temp.toString());
+                    //----------------------------------added--------------------------------------
+                    //writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"tag\":\"" + idTag + "\",\"status\":\"created\",\"response\":" + objectMapper.writeValueAsString(result.getResponse()) + "}");
                 }
             }
         } catch (NullPointerException nullPointerException) {
@@ -109,8 +144,8 @@ public class ApiController {
         }
     }
 
-    @GetMapping(value = sCHARGEBOXID + "/getMetering/{transactionId}")
-    public void getMetering0(@PathVariable("chargeBoxId") String chargeBoxId, 
+    @GetMapping(value = "/getMetering" + sCHARGEBOXID +"/{transactionId}")
+    public void getMetering0(@PathVariable("chargeBoxId") String chargeBoxId,
                             @PathVariable("transactionId") String transactionId,
                                       HttpServletResponse response) throws IOException {
         List<Integer> transactionIDs = transactionRepository.getActiveTransactionIds(chargeBoxId);
@@ -151,10 +186,85 @@ public class ApiController {
             lastValue = startValue;
             lastValueTimestamp = startValueTimestamp;
         }
-        writeOutput(response, "{\"transactionId\":\"" + transactionId + "\",\"chargeBoxId\":\"" + charger + "\",\"tag\":\"" + tag + "\",\"connectorId\":\"" + connector + "\",\"startValue\":\"" + startValue + "\",\"startValueTimestamp\":\"" + startValueTimestamp + "\",\"lastValue\":\"" + lastValue + "\",\"lastValueTimestamp\":\"" + lastValueTimestamp + "\"}");
+
+        //-----------------------------------added------------------------------------
+        JSONObject temp = new JSONObject();
+        temp.put("transactionId", transactionId);
+        temp.put("chargeBoxId", charger);
+        temp.put("tag", tag);
+        temp.put("connectorId", connector);
+        temp.put("startValue", startValue);
+        temp.put("startValueTimestamp", startValueTimestamp);
+        temp.put("lastValue", lastValue);
+        temp.put("lastValueTimestamp", lastValueTimestamp);
+        writeOutput(response, temp.toString());
+        //----------------------------------added--------------------------------------
+        //writeOutput(response, "{\"transactionId\":\"" + transactionId + "\",\"chargeBoxId\":\"" + charger + "\",\"tag\":\"" + tag + "\",\"connectorId\":\"" + connector + "\",\"startValue\":\"" + startValue + "\",\"startValueTimestamp\":\"" + startValueTimestamp + "\",\"lastValue\":\"" + lastValue + "\",\"lastValueTimestamp\":\"" + lastValueTimestamp + "\"}");
     }
 
-    @GetMapping(value = sCHARGEBOXID + "/stopTransaction/{transactionId}")
+    //-----------divyanshu--------
+    @GetMapping(value = "/stopBunchTransaction" + sCHARGEBOXID + "/{day}/{month}/{year}")
+    public void stopBunchTransaction(@PathVariable("chargeBoxId") String chargeBoxId,
+                                        @PathVariable("day") int switchOffDay,
+                                        @PathVariable("month") int switchOffMonth,
+                                        @PathVariable("year") int switchOffYear,
+                                      HttpServletResponse response) throws IOException {
+        try{
+            int startingMonth,startingDay,startingYear;
+            /*Calendar calendar = Calendar.getInstance();
+            int currentYear = calendar.get(Calendar.YEAR);
+            int currentMonth = calendar.get(Calendar.MONTH)+1;
+            int currentDay = calendar.get(Calendar.DATE);*/
+            RemoteStopTransactionParams params = new RemoteStopTransactionParams();
+            List<Integer> transactionIDs = transactionRepository.getActiveTransactionIds(chargeBoxId);
+            
+            JSONObject temp = new JSONObject();
+            for(int i=0;i<transactionIDs.size();i++){
+                TransactionDetails thisTxDetails = transactionRepository.getDetails(transactionIDs.get(i));
+                Transaction thisTx = thisTxDetails.getTransaction();
+                startingYear = thisTx.getStartTimestampDT().year().get();
+                startingMonth = thisTx.getStartTimestampDT().monthOfYear().get();
+                startingDay = thisTx.getStartTimestampDT().dayOfMonth().get();
+                if(transactionIDs.get(i)!=323){
+                    if(startingYear<switchOffYear){
+                                temp.put(String.valueOf(i),transactionIDs.get(i));
+                                transactionStopService.stop(transactionIDs.get(i));
+                    }
+                    else if(startingYear==switchOffYear){
+                        if(startingMonth<switchOffMonth){
+                            temp.put(String.valueOf(i),transactionIDs.get(i));
+                            transactionStopService.stop(transactionIDs.get(i));
+                        }
+                        else if(startingMonth==switchOffMonth){
+                            if(startingDay<switchOffDay){
+                                temp.put(String.valueOf(i),transactionIDs.get(i));
+                                transactionStopService.stop(transactionIDs.get(i));
+                            }
+                        }
+                    }
+                }
+            }
+            temp.put("Task : ","Transaction Deletion");
+            temp.put("Task status : ", "Completed");
+            temp.put("chargeBoxId : ",chargeBoxId);
+
+            writeOutput(response, temp.toString());
+
+        } catch (NullPointerException nullPointerException) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            JSONObject temp = new JSONObject();
+            temp.put("chargeBoxId", chargeBoxId);
+            temp.put("connectorId", 2);
+            temp.put("tag", "unknown");
+            temp.put("status", "failed");
+            temp.put("response", "Request invalid");
+            writeOutput(response, temp.toString());
+
+        }
+    }
+    //-----------divyanshu--------
+
+    @GetMapping(value =  "/stopTransaction" + sCHARGEBOXID + "/{transactionId}")
     public void stopRemoteTransaction(@PathVariable("chargeBoxId") String chargeBoxId,
                                       @PathVariable("transactionId") String transactionId,
                                       HttpServletResponse response) throws IOException {
@@ -175,22 +285,60 @@ public class ApiController {
                         RequestResult result = (RequestResult) task.getResultMap().get(chargeBoxId);
                         transactionStopService.stop(transactionIDs);
                         // writeOutput(response, objectMapper.writeValueAsString(result.getResponse()));
-                        writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"transactionId\":\"" + transactionId + "\",\"status\":\"created\",\"response\":" + objectMapper.writeValueAsString(result.getResponse()) + "}");
-                } else {
+
+                        //-----------------------------------added------------------------------------
+                        JSONObject temp = new JSONObject();
+                        temp.put("chargeBoxId", chargeBoxId);
+                        temp.put("connectorId", 2);
+                        temp.put("transactionId",transactionId);
+                        temp.put("status", "created");
+                        temp.put("response", objectMapper.writeValueAsString(result.getResponse()));
+                        writeOutput(response, temp.toString());
+                    //----------------------------------added--------------------------------------
+                        //writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"transactionId\":\"" + transactionId + "\",\"status\":\"created\",\"response\":" + objectMapper.writeValueAsString(result.getResponse()) + "}");
+                
+                    } else {
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
-                    writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"transactionId\":\"" + transactionId + "\",\"status\":\"failed\",\"response\":\"Transaction-Charger mismatched\"}");
+                    //-----------------------------------added------------------------------------
+                    JSONObject temp = new JSONObject();
+                    temp.put("chargeBoxId", chargeBoxId);
+                    temp.put("connectorId", 2);
+                    temp.put("transactionId", transactionId);
+                    temp.put("status", "failed");
+                    temp.put("response", "Transaction-Charger mismatched");
+                    writeOutput(response, temp.toString());
+                    //----------------------------------added--------------------------------------
+                    //writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"transactionId\":\"" + transactionId + "\",\"status\":\"failed\",\"response\":\"Transaction-Charger mismatched\"}");
                 }
             } else {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
+                //-----------------------------------added------------------------------------
+                JSONObject temp = new JSONObject();
+                temp.put("chargeBoxId", chargeBoxId);
+                temp.put("connectorId", 2);
+                temp.put("transactionId", transactionId);
+                temp.put("status", "failed");
+                temp.put("response", "Transactions inactive");
+                writeOutput(response, temp.toString());
+                //----------------------------------added--------------------------------------
                 writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"transactionId\":\"" + transactionId + "\",\"status\":\"failed\",\"response\":\"Transactions inactive\"}");
             }
         } catch (NullPointerException nullPointerException) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"tag\":\"unknown\",\"status\":\"failed\",\"response\":\"Request invalid\"}");
+            //-----------------------------------added------------------------------------
+            JSONObject temp = new JSONObject();
+            temp.put("chargeBoxId", chargeBoxId);
+            temp.put("connectorId", 2);
+            temp.put("tag", "unknown");
+            temp.put("status", "failed");
+            temp.put("response", "Request invalid");
+            writeOutput(response, temp.toString());
+            //----------------------------------added--------------------------------------
+            //writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"tag\":\"unknown\",\"status\":\"failed\",\"response\":\"Request invalid\"}");
         }
     }
 
-    @GetMapping(value = sCHARGEBOXID + "/stopSession/{ocpp_parent}")
+    @GetMapping(value = "/stopSession" + sCHARGEBOXID + "/{ocpp_parent}")
     public void stopRemoteSession(@PathVariable("chargeBoxId") String chargeBoxId,
                                   @PathVariable("ocpp_parent") String ocpp_parent,
                                   HttpServletResponse response) throws IOException {
@@ -213,21 +361,65 @@ public class ApiController {
                     RequestResult result = (RequestResult) task.getResultMap().get(chargeBoxId);
                     transactionStopService.stop(transactionIDs);
                     // writeOutput(response, objectMapper.writeValueAsString(result.getResponse()));
-                    writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"tag\":\"" + ocpp_parent + "\",\"status\":\"created\",\"response\":" + objectMapper.writeValueAsString(result.getResponse()) + "}");
+
+                    //-----------------------------------added------------------------------------
+                    JSONObject temp = new JSONObject();
+                    temp.put("chargeBoxId", chargeBoxId);
+                    temp.put("connectorId", 2);
+                    temp.put("tag", ""+ocpp_parent);
+                    temp.put("status", "created");
+                    temp.put("response", objectMapper.writeValueAsString(result.getResponse()));
+                    writeOutput(response, temp.toString());
+                    //----------------------------------added--------------------------------------
+
+                    //writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"tag\":\"" + ocpp_parent + "\",\"status\":\"created\",\"response\":" + objectMapper.writeValueAsString(result.getResponse()) + "}");
                 } else {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     // writeOutput(response, objectMapper.writeValueAsString("Not your charging session"));
-                    writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"tag\":\"" + ocpp_parent + "\",\"status\":\"failed\",\"response\":\"Transaction-Tag mismatched\"}");
+
+                    //-----------------------------------added------------------------------------
+                    JSONObject temp = new JSONObject();
+                    temp.put("chargeBoxId", chargeBoxId);
+                    temp.put("connectorId", 2);
+                    temp.put("tag", ""+ocpp_parent);
+                    temp.put("status", "failed");
+                    temp.put("response", "Transaction-Tag mismatched");
+                    writeOutput(response, temp.toString());
+                    //----------------------------------added--------------------------------------
+
+                    //writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"tag\":\"" + ocpp_parent + "\",\"status\":\"failed\",\"response\":\"Transaction-Tag mismatched\"}");
                 }
             } else {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 response.setHeader("Access-Control-Allow-Origin", "*");
                 // writeOutput(response, objectMapper.writeValueAsString("No active transaction"));
-                writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"tag\":\"" + ocpp_parent + "\",\"status\":\"failed\",\"response\":\"Transactions inactive\"}");
+
+                //-----------------------------------added------------------------------------
+                JSONObject temp = new JSONObject();
+                temp.put("chargeBoxId", chargeBoxId);
+                temp.put("connectorId", 2);
+                temp.put("tag", ""+ocpp_parent);
+                temp.put("status", "failed");
+                temp.put("response", "Transactions inactive");
+                writeOutput(response, temp.toString());
+                //----------------------------------added--------------------------------------
+
+                //writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"tag\":\"" + ocpp_parent + "\",\"status\":\"failed\",\"response\":\"Transactions inactive\"}");
             }
         } catch (NullPointerException nullPointerException) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"tag\":\"" + ocpp_parent + "\",\"status\":\"failed\",\"response\":\"Request invalid\"}");
+
+            //-----------------------------------added------------------------------------
+            JSONObject temp = new JSONObject();
+            temp.put("chargeBoxId", chargeBoxId);
+            temp.put("connectorId", 2);
+            temp.put("tag", ""+ocpp_parent);
+            temp.put("status", "failed");
+            temp.put("response", "Request invalid");
+            writeOutput(response, temp.toString());
+            //----------------------------------added--------------------------------------
+
+            //writeOutput(response, "{\"chargeBoxId\":\"" + chargeBoxId + "\",\"connectorId\":\"2\",\"tag\":\"" + ocpp_parent + "\",\"status\":\"failed\",\"response\":\"Request invalid\"}");
         }
     }
 
@@ -275,22 +467,42 @@ public class ApiController {
 
             // writeOutput(response, serializeArray(cbDetails));
 
-            AddressRecord addressRecord = cp.getAddress();
-            String x1 = "{\"chargeBoxSerialNumber\":\"" + cp.getChargeBox().getChargeBoxSerialNumber() + "\",\"chargePointModel\":\"" + cp.getChargeBox().getChargePointModel() + "\",\"chargeBoxId\":\"" + cp.getChargeBox().getChargeBoxId() + "\",\"chargePointVendor\":\"" + cp.getChargeBox().getChargePointVendor() + "\",";
-            String x2 = "\"address\":\"" + addressRecord.getStreet() + " " + addressRecord.getHouseNumber() + ", "
-                    + addressRecord.getCountry() + " " + addressRecord.getZipCode() + " " + addressRecord.getCity() + "\",";
+
+            //---------------------addded-----------------------------
 
             List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus();
             List<ConnectorStatus> filteredList = ConnectorStatusFilter.filterAndPreferZero(latestList);
 
-            String x3 = "\"status\":\"" + filteredList.stream()
-                    .parallel()
-                    .filter(cs -> chargeBoxId.equals(cs.getChargeBoxId()))
-                    .findAny()
-                    .orElse(null).getStatus() + "\",";
-            String x4 = "\"heartbeatTimestamp\":\"" + cp.getChargeBox().getLastHeartbeatTimestamp().getMillis() + "\"}";
+            AddressRecord addressRecord = cp.getAddress();
+            JSONObject temp1 = new JSONObject();
+            temp1.put("chargeBoxSerialNumber", cp.getChargeBox().getChargeBoxSerialNumber());
+            temp1.put("chargePointModel", cp.getChargeBox().getChargePointModel());
+            temp1.put("chargeBoxId", cp.getChargeBox().getChargeBoxId());
+            temp1.put("chargePointVendor", cp.getChargeBox().getChargePointVendor());
+            temp1.put("address", addressRecord.getStreet() + " " + addressRecord.getHouseNumber() + ", " + addressRecord.getCountry() + " " + addressRecord.getZipCode() + " " + addressRecord.getCity());
+            temp1.put("status" , filteredList.stream().parallel().filter(cs -> chargeBoxId.equals(cs.getChargeBoxId())).findAny().orElse(null).getStatus());
+            temp1.put("heartbeatTimestamp" , cp.getChargeBox().getLastHeartbeatTimestamp().getMillis());
 
-            writeOutput(response, x1 + x2 + x3 + x4);
+            String x1 = temp1.toString();
+            //---------------------addded-----------------------------
+            
+
+            // String x1 = "{\"chargeBoxSerialNumber\":\"" + cp.getChargeBox().getChargeBoxSerialNumber() + "\",\"chargePointModel\":\"" + cp.getChargeBox().getChargePointModel() + "\",\"chargeBoxId\":\"" + cp.getChargeBox().getChargeBoxId() + "\",\"chargePointVendor\":\"" + cp.getChargeBox().getChargePointVendor() + "\",";
+            
+            // String x2 = "\"address\":\"" + addressRecord.getStreet() + " " + addressRecord.getHouseNumber() + ", "
+            //        + addressRecord.getCountry() + " " + addressRecord.getZipCode() + " " + addressRecord.getCity() + "\",";
+
+
+
+            // String x3 = "\"status\":\"" + filteredList.stream()
+            //         .parallel()
+            //         .filter(cs -> chargeBoxId.equals(cs.getChargeBoxId()))
+            //         .findAny()
+            //         .orElse(null).getStatus() + "\",";
+
+            // String x4 = "\"heartbeatTimestamp\":\"" + cp.getChargeBox().getLastHeartbeatTimestamp().getMillis() + "\"}";
+
+            writeOutput(response, x1);
         } catch (NullPointerException nullPointerException) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }

@@ -35,11 +35,10 @@ import org.springframework.web.client.RestTemplate;
 
 import org.json.JSONObject;
 
-@Slf4j
+
 @Service
 public class FlowService {
     @Autowired private SteveSettingsRepository settingsRepository;
-    @Autowired private ScheduledExecutorService executorService;
 
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock readLock = readWriteLock.readLock();
@@ -47,16 +46,15 @@ public class FlowService {
 
     private FlowSettings settings;
 
-    @PostConstruct
-    public void loadSettingsFromDB() {
-        writeLock.lock();
-        try {
-            settings = settingsRepository.getFlowSettings();
-        } finally {
-            writeLock.unlock();
-        }
-        //session = createSession(getSettings());
-    }
+    // @PostConstruct
+    // public void loadSettingsFromDB() {
+    //     writeLock.lock();
+    //     try {
+    //         settings = settingsRepository.getFlowSettings();
+    //     } finally {
+    //         writeLock.unlock();
+    //     }
+    // }
 
     public FlowSettings getSettings() {
         readLock.lock();
@@ -70,22 +68,9 @@ public class FlowService {
     private RestTemplate restTemplate;
 
     private static final int API_TIMEOUT_IN_MILLIS = 4_000;
-    //@PostConstruct
-    // private void init() {
-    //     HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-    //     factory.setReadTimeout(API_TIMEOUT_IN_MILLIS);
-    //     factory.setConnectTimeout(API_TIMEOUT_IN_MILLIS);
-
-    //     ObjectMapper mapper = new ObjectMapper();
-    //     mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-    //     mapper.setPropertyNamingStrategy(new PropertyNamingStrategy.SnakeCaseStrategy());
-
-    //     restTemplate = new RestTemplate(Collections.singletonList(new MappingJackson2HttpMessageConverter(mapper)));
-    //     restTemplate.setRequestFactory(factory);
-    // }
-
-    public void sendAsync(String endpoint, JSONObject body) {
-
+    
+    @PostConstruct
+    private void init() {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         factory.setReadTimeout(API_TIMEOUT_IN_MILLIS);
         factory.setConnectTimeout(API_TIMEOUT_IN_MILLIS);
@@ -96,9 +81,16 @@ public class FlowService {
 
         restTemplate = new RestTemplate(Collections.singletonList(new MappingJackson2HttpMessageConverter(mapper)));
         restTemplate.setRequestFactory(factory);
+    }
 
+    public void sendAsync(String endpoint, JSONObject body) {
 
-
+        writeLock.lock();
+        try {
+            settings = settingsRepository.getFlowSettings();
+        } finally {
+            writeLock.unlock();
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-API-KEY", "6ovuIrVd1vVGdVnE5TtwTxPhlzZf+Dmkf6mIQw6IBMk=");
@@ -106,12 +98,13 @@ public class FlowService {
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         HttpEntity entity = new HttpEntity(body.toMap(), headers);
         System.out.println(body);
-        FlowSettings settings = getSettings();
-        String flow_link = settings.getFlow();
-
+        FlowSettings settings1 = getSettings();
+        String flow_link = settings1.getFlow();
+        System.out.println(flow_link);
         try {
-            String response = restTemplate.postForObject(flow_link, entity, String.class);
-             System.out.println(response);
+            String response = new String();
+            response = restTemplate.postForObject(flow_link, entity, String.class);
+            System.out.println(response);
         } catch (RestClientException e) {
             //System.out.println("WebhookService Error");
             //System.out.println(e);
@@ -122,6 +115,9 @@ public class FlowService {
 
 // org.springframework.web.client.UnknownContentTypeException: Could not extract response: no suitable HttpMessageConverter found for 
 // response type [class java.lang.String] and content type [text/html;charset=utf-8]
+
+//org.springframework.web.client.ResourceAccessException: I/O error on POST request for "http://2.irasus.com:1947/flowLink1": null; 
+//nested exception is org.apache.http.client.ClientProtocolException
 
        
 
