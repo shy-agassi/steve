@@ -48,9 +48,6 @@ import java.util.List;
 // Added by Anirudh on 23/03/2021
 import org.json.JSONObject;
 
-// import ocpp.cs._2015._10.MeterValue;
-// import java.util.List;
-
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 22.01.2016
@@ -58,10 +55,9 @@ import org.json.JSONObject;
 @Slf4j
 @Service
 public class NotificationService {
-
     @Autowired private MailService mailService;
-    @Autowired private FlowService webhookService;
-
+    @Autowired private WebhookService webhookService;
+    String registration_status_member;
     public void ocppStationBooted(String chargeBoxId, Optional<RegistrationStatus> status) {
         if (isDisabled(OcppStationBooted)) {
             return;
@@ -77,12 +73,14 @@ public class NotificationService {
             body = format("Charging station '%s' is NOT in database", chargeBoxId);
         }
 
+        System.out.print(body);
+        registration_status_member = registration_status;
+
         JSONObject bodyObject = new JSONObject();
         bodyObject.put("boot", 1);
-        bodyObject.put("packetType", "boot");
         bodyObject.put("error", "");
         bodyObject.put("connection", "");
-        bodyObject.put("connectorId", "0");
+        bodyObject.put("connectorId", 0);
         bodyObject.put("chargeBoxId", chargeBoxId);
         bodyObject.put("registration", registration_status);
         bodyObject.put("iat", DateTime.now().toString());
@@ -92,15 +90,12 @@ public class NotificationService {
     }
 
     public void ocppHeartbeat(String chargeBoxId, String timestamp) {
-        //System.out.println("HeartBeat function enter");
         JSONObject bodyObject = new JSONObject();
         bodyObject.put("heartbeat", 1);
-        bodyObject.put("Task","HeartBeat");
-        bodyObject.put("Connection","True");
-        bodyObject.put("ConnectorID","0");
-        bodyObject.put("ChargeBoxid",chargeBoxId);
-        bodyObject.put("TimeStand",timestamp);
-        bodyObject.put("iat",DateTime.now().toString());
+        bodyObject.put("connection","True");
+        bodyObject.put("connectorId",0);
+        bodyObject.put("chargeBoxId",chargeBoxId);
+        bodyObject.put("timestamp",timestamp);
         webhookService.sendAsync("station", bodyObject);
     }
 
@@ -108,10 +103,9 @@ public class NotificationService {
     public void ocppDiagnostics(String chargeBoxId, String status) {
         //JSONObject bodyObject = new JSONObject();
         //bodyObject.put("diagnostics", 1);
-        //bodyObject.put("Task","HeartBeat");
-        //bodyObject.put("Connection","True");
-        //bodyObject.put("ConnectorID","0");
-        //bodyObject.put("ChargeBoxid",chargeBoxId);
+        //bodyObject.put("connection","True");
+        //bodyObject.put("connectorId","0");
+        //bodyObject.put("chargeBoxId",chargeBoxId);
         //bodyObject.put("status",status);
         //bodyObject.put("iat",DateTime.now().toString());
         //webhookService.sendAsync("station", bodyObject);
@@ -122,15 +116,17 @@ public class NotificationService {
     {   
         JSONObject bodyObject = new JSONObject();
         bodyObject.put("metering", 1);
-        bodyObject.put("Task","Metering");
-        bodyObject.put("ChargeBoxId",chargeBoxId);
-        bodyObject.put("Connection","True");
+        bodyObject.put("connectorId",0);
+        bodyObject.put("error", "");
+        bodyObject.put("chargeBoxId",chargeBoxId);
+        bodyObject.put("connection","True");
         //values.get(0).getSampledValue().get(0).getValue()
         //bodyObject.put("Meter Value", values);
-        bodyObject.put("Voltage Value", values.get(0).getSampledValue().get(0).getValue());
-        bodyObject.put("Current Value", values.get(0).getSampledValue().get(1).getValue());
-        bodyObject.put("Power Value", values.get(0).getSampledValue().get(2).getValue());
-        bodyObject.put("Energy Value", values.get(0).getSampledValue().get(3).getValue());
+        bodyObject.put("iat",DateTime.now().toString());
+        bodyObject.put("voltageValue", values.get(0).getSampledValue().get(0).getValue());
+        bodyObject.put("currentValue", values.get(0).getSampledValue().get(1).getValue());
+        bodyObject.put("powerValue", values.get(0).getSampledValue().get(2).getValue());
+        bodyObject.put("energyValue", values.get(0).getSampledValue().get(3).getValue());
         webhookService.sendAsync("station", bodyObject);
     }
 
@@ -146,15 +142,14 @@ public class NotificationService {
 
         JSONObject bodyObject = new JSONObject();
         bodyObject.put("socketConnect", 1);
-        bodyObject.put("packetType", "wsconnect");
         bodyObject.put("error", "");
-        bodyObject.put("registration", "");
-        bodyObject.put("connection", "true");
-        bodyObject.put("connectorId", "0");
+        bodyObject.put("registration", registration_status_member);
+        bodyObject.put("connection", "True");
+        bodyObject.put("connectorId", 0);
         bodyObject.put("chargeBoxId", chargeBoxId);
         bodyObject.put("iat", DateTime.now().toString());
         webhookService.sendAsync("station", bodyObject);
-        //System.out.println("working here");
+        
         // mailService.sendAsync(subject, addTimestamp(""));
     }
 
@@ -167,12 +162,11 @@ public class NotificationService {
 
         JSONObject bodyObject = new JSONObject();
         bodyObject.put("socketDisconnect", 1);
-        bodyObject.put("packetType", "wsconnect");
         bodyObject.put("error", "");
-        bodyObject.put("registration", "");
-        bodyObject.put("connectorId", "0");
+        bodyObject.put("registration", registration_status_member);
+        bodyObject.put("connectorId", 0);
         bodyObject.put("chargeBoxId", chargeBoxId);
-        bodyObject.put("connection", "false");
+        bodyObject.put("connection", "False");
         bodyObject.put("iat", DateTime.now().toString());
         webhookService.sendAsync("station", bodyObject);
 
@@ -189,10 +183,9 @@ public class NotificationService {
 
         JSONObject bodyObject = new JSONObject();
         bodyObject.put("statusFailure", 1);
-        bodyObject.put("packetType", "fault");
         bodyObject.put("error", errorCode);
-        bodyObject.put("registration", "");
-        bodyObject.put("connectorId", format("%s", connectorId));
+        bodyObject.put("registration", registration_status_member);
+        bodyObject.put("connectorId", connectorId);
         bodyObject.put("chargeBoxId", chargeBoxId);
         bodyObject.put("connection", "");
         bodyObject.put("iat", DateTime.now().toString());
@@ -212,8 +205,7 @@ public class NotificationService {
         bodyObject.put("transactionStarted", 1);
         bodyObject.put("chargeBoxId", params.getChargeBoxId());
         bodyObject.put("connectorId", params.getConnectorId());
-        bodyObject.put("transactionId", format("%s", transactionId));
-        bodyObject.put("transaction", "start");
+        bodyObject.put("transactionId", transactionId);
         bodyObject.put("tag", params.getIdTag());
         bodyObject.put("meter", params.getStartMeterValue());
         bodyObject.put("iat", params.getStartTimestamp().toString());
@@ -233,7 +225,6 @@ public class NotificationService {
         bodyObject.put("transactionEnded", 1);
         bodyObject.put("chargeBoxId", params.getChargeBoxId());
         bodyObject.put("transactionId", params.getTransactionId());
-        bodyObject.put("transaction", "stop");
         bodyObject.put("iat", params.getStopTimestamp().toString());
         bodyObject.put("reason", params.getStopReason());
         bodyObject.put("meter", params.getStopMeterValue());
@@ -293,5 +284,4 @@ public class NotificationService {
             return body + newLine + "--" + newLine + eventTs;
         }
     }
-
 }

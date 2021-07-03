@@ -23,7 +23,7 @@ import com.google.common.base.Splitter;
 import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.SteveSettingsRepository;
-import de.rwth.idsg.steve.repository.dto.FlowSettings;
+import de.rwth.idsg.steve.repository.dto.WebhookSettings;
 import de.rwth.idsg.steve.repository.dto.MailSettings;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
 import jooq.steve.db.tables.records.SteveSettingsRecord;
@@ -74,8 +74,8 @@ public class SteveSettingsRepositoryImpl implements SteveSettingsRepository {
                            .heartbeat(toMin(r.getHeartbeatIntervalInSeconds()))
                            .expiration(r.getHoursToExpire())
                            .enabled(r.getMailEnabled())
-                           .flowEnabled(r.getFlowEnabled()) 
-                           .flow(r.getFlow())
+                           .webhookEnabled(r.getWebhookEnabled()) 
+                           .webhook(r.getWebhook())
                            .host(r.getMailHost())
                            .username(r.getMailUsername())
                            .password(r.getMailPassword())
@@ -109,14 +109,14 @@ public class SteveSettingsRepositoryImpl implements SteveSettingsRepository {
     }
 
     @Override
-    public FlowSettings getFlowSettings() {
+    public WebhookSettings getWebhookSettings() {
         SteveSettingsRecord r = getInternal();
 
         List<NotificationFeature> features = splitFeatures(r.getNotificationFeatures());
 
-        return FlowSettings.builder()
-                            .flowEnabled(r.getFlowEnabled()) 
-                            .flow(r.getFlow())
+        return WebhookSettings.builder()
+                            .webhookEnabled(r.getWebhookEnabled()) 
+                            .webhook(r.getWebhook())
                             .enabledFeatures(features)
                             .build();
     }
@@ -141,8 +141,8 @@ public class SteveSettingsRepositoryImpl implements SteveSettingsRepository {
                .set(STEVE_SETTINGS.HEARTBEAT_INTERVAL_IN_SECONDS, toSec(form.getHeartbeat()))
                .set(STEVE_SETTINGS.HOURS_TO_EXPIRE, form.getExpiration())
                .set(STEVE_SETTINGS.MAIL_ENABLED, form.getEnabled())
-               .set(STEVE_SETTINGS.FLOW_ENABLED, form.getFlowEnabled())
-               .set(STEVE_SETTINGS.FLOW, form.getFlow())
+               .set(STEVE_SETTINGS.WEBHOOK_ENABLED, form.getWebhookEnabled())
+               .set(STEVE_SETTINGS.WEBHOOK, form.getWebhook())
                .set(STEVE_SETTINGS.MAIL_HOST, form.getHost())
                .set(STEVE_SETTINGS.MAIL_USERNAME, form.getUsername())
                .set(STEVE_SETTINGS.MAIL_PASSWORD, form.getPassword())

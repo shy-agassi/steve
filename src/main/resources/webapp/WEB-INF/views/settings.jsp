@@ -65,8 +65,8 @@
         <tr><td>User name:</td><td><form:input path="username"/></td></tr>
         <tr><td>Password:</td><td><form:input path="password"/></td></tr>
 
-        <tr><td>Enable Flow Notifications?:</td><td><form:checkbox path="flowEnabled"/></td></tr>
-        <tr><td>Flow Control Link:</td><td><form:input path="flow"/></td></tr>
+        <tr><td>Enable Webhook Notifications?:</td><td><form:checkbox path="webhookEnabled"/></td></tr>
+        <tr><td>Webhook Control Link:</td><td><form:input path="webhook"/></td></tr>
 
         <tr><td>Recipients:</td>
             <td><form:textarea path="recipients"/></td>

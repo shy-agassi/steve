@@ -59,7 +59,7 @@ public class SettingsForm {
     // -------------------------------------------------------------------------
 
     @NotNull
-    private Boolean enabled,flowEnabled;
+    private Boolean enabled,webhookEnabled;
     //-----------
     //----------
 
@@ -69,7 +69,7 @@ public class SettingsForm {
     private String host, username, password, protocol;
     
     //--------------
-    private String flow;
+    private String webhook;
     
     //--------------------
 

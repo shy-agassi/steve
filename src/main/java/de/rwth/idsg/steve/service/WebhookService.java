@@ -1,5 +1,20 @@
 package de.rwth.idsg.steve.service;
 
+import com.google.common.base.Strings;
+import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.repository.SteveSettingsRepository;
+import de.rwth.idsg.steve.repository.dto.WebhookSettings;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.util.Properties;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +43,32 @@ import org.json.JSONObject;
 @Slf4j
 @Service
 public class WebhookService {
+    @Autowired private SteveSettingsRepository settingsRepository;
+
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private final Lock readLock = readWriteLock.readLock();
+    private final Lock writeLock = readWriteLock.writeLock();
+
+    private WebhookSettings settings;
+
+    // @PostConstruct
+    // public void loadSettingsFromDB() {
+    //     writeLock.lock();
+    //     try {
+    //         settings = settingsRepository.getFlowSettings();
+    //     } finally {
+    //         writeLock.unlock();
+    //     }
+    // }
+
+    public WebhookSettings getSettings() {
+        readLock.lock();
+        try {
+            return this.settings;
+        } finally {
+            readLock.unlock();
+        }
+    }
 
     private RestTemplate restTemplate;
 
@@ -48,18 +89,30 @@ public class WebhookService {
     }
 
     public void sendAsync(String endpoint, JSONObject body) {
+
+        writeLock.lock();
+        try {
+            settings = settingsRepository.getWebhookSettings();
+        } finally {
+            writeLock.unlock();
+        }
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-API-KEY", "6ovuIrVd1vVGdVnE5TtwTxPhlzZf+Dmkf6mIQw6IBMk=");
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         HttpEntity entity = new HttpEntity(body.toMap(), headers);
-        // System.out.println(body);
+        System.out.println(body);
+        WebhookSettings settings1 = getSettings();
+        String webhook_link = settings1.getWebhook();
+        System.out.println(webhook_link);
         try {
-            String response = restTemplate.postForObject("https://dev-api.chargedock.in/ocpp/" + endpoint, entity, String.class);
-            // System.out.println(response);
+            String response = new String();
+            response = restTemplate.postForObject(webhook_link, entity, String.class);
+            System.out.println(response);
         } catch (RestClientException e) {
-            // System.out.println("WebhookService Error");
-            // System.out.println("");
+            //System.out.println("WebhookService Error");
+            //System.out.println(e);
         }
     }
 

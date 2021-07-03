@@ -67,14 +67,14 @@ public class ApiController {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
-    @GetMapping(value = "/connectorIds" + sCHARGEBOXID)
+    @GetMapping(value = sCHARGEBOXID + "/connectorIds")
     public void getConnectorIds(@PathVariable("chargeBoxId") String chargeBoxId,
                                 HttpServletResponse response) throws IOException {
         String s = serializeArray(chargePointRepository.getNonZeroConnectorIds(chargeBoxId));
         writeOutput(response, s);
     }
 
-    @GetMapping(value = "/startSession"+ sCHARGEBOXID + "/{idTag}")
+    @GetMapping(value = sCHARGEBOXID + "/startSession/{idTag}")
     public void startRemoteSession(@PathVariable("chargeBoxId") String chargeBoxId,
                                    @PathVariable("idTag") String idTag,
                                    HttpServletResponse response) throws IOException {
@@ -144,7 +144,7 @@ public class ApiController {
         }
     }
 
-    @GetMapping(value = "/getMetering" + sCHARGEBOXID +"/{transactionId}")
+    @GetMapping(value = sCHARGEBOXID + "/getMetering/{transactionId}")
     public void getMetering0(@PathVariable("chargeBoxId") String chargeBoxId,
                             @PathVariable("transactionId") String transactionId,
                                       HttpServletResponse response) throws IOException {
@@ -203,7 +203,7 @@ public class ApiController {
     }
 
     //-----------divyanshu--------
-    @GetMapping(value = "/stopBunchTransaction" + sCHARGEBOXID + "/{day}/{month}/{year}")
+    @GetMapping(value = sCHARGEBOXID + "/stopBunchTransaction/{day}/{month}/{year}")
     public void stopBunchTransaction(@PathVariable("chargeBoxId") String chargeBoxId,
                                         @PathVariable("day") int switchOffDay,
                                         @PathVariable("month") int switchOffMonth,
@@ -264,7 +264,7 @@ public class ApiController {
     }
     //-----------divyanshu--------
 
-    @GetMapping(value =  "/stopTransaction" + sCHARGEBOXID + "/{transactionId}")
+    @GetMapping(value = sCHARGEBOXID + "/stopTransaction/{transactionId}")
     public void stopRemoteTransaction(@PathVariable("chargeBoxId") String chargeBoxId,
                                       @PathVariable("transactionId") String transactionId,
                                       HttpServletResponse response) throws IOException {
@@ -338,7 +338,8 @@ public class ApiController {
         }
     }
 
-    @GetMapping(value = "/stopSession" + sCHARGEBOXID + "/{ocpp_parent}")
+
+    @GetMapping(value = sCHARGEBOXID + "/stopSession/{ocpp_parent}")
     public void stopRemoteSession(@PathVariable("chargeBoxId") String chargeBoxId,
                                   @PathVariable("ocpp_parent") String ocpp_parent,
                                   HttpServletResponse response) throws IOException {
